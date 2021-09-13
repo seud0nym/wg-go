@@ -1,4 +1,4 @@
-VERSION ?= `[ -d ".git" ] && git describe --tags || echo "0.0.0"`
+VERSION ?= `[ -d ".git" ] && git describe --tags || date +%Y.%m.%d-dev`
 LDFLAGS=-ldflags "-s -w -X main.appVersion=${VERSION}"
 BINARY="wg-go"
 

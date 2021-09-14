@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Wrapper for wg-go executable
+WG=$(which wg-go)
+if [ -z "$WG" ]; then
+    echo "ERROR: Could not locate the wg-go executable!"
+    exit 2
+fi
+
+export WG_COMMAND="$(basename $0)"
+
+$WG "$@"
+RC=$?
+
+unset WG_COMMAND
+
+exit $RC

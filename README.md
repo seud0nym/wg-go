@@ -6,6 +6,8 @@ This tool could be used to get and set the configuration of WireGuard tunnel int
 
 It can be used in conjunction with [wireguard-go](https://git.zx2c4.com/wireguard-go/about/) for an almost complete userspace implementation of Wireguard on platforms which can be targeted by Go but do not have an implementation of Wireguard available.
 
+`wg-go` can also control a kernel-based Wireguard configuration.
+
 For more information on WireGuard, please see https://www.wireguard.com/.
 
 ## Supported Sub-commands

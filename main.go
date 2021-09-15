@@ -36,7 +36,7 @@ func main() {
 	case "pubkey":
 		pubKey(opts)
 		break
-	case "version":
+	case "--version":
 		showVersion(opts)
 		break
 	default:
@@ -91,8 +91,7 @@ func showCommandUsage(code int, opts *cmdOptions) {
   setconf:  Applies a configuration file to a WireGuard interface
   genkey:   Generates a new private key and writes it to stdout
   genpsk:   Generates a new preshared key and writes it to stdout
-  pubkey:   Reads a private key from stdin and writes a public key to stdout
-  version:  Shows the version`
+  pubkey:   Reads a private key from stdin and writes a public key to stdout`
 
 	fmt.Printf("Usage: %s <cmd> [<args>]\n\n", opts.Command)
 	fmt.Printf("%s\n\n", subcommands)

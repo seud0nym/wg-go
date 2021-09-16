@@ -22,6 +22,12 @@ This implementation supports the following sub-commands as specified in [wg(8)](
   pubkey:   Reads a private key from stdin and writes a public key to stdout
 ```
 
+The `--version` command line option is also supported to show the release version.
+
+### Script Wrapper
+
+The `wg` script provides a convenient wrapper around `wg-go` to provide a level of compatibility with the [wg(8)](https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8) utility.
+
 ## How does this work?
 
 This tool uses [wgctrl-go](https://github.com/WireGuard/wgctrl-go/) to enable control of Wireguard devices on multiple platforms.

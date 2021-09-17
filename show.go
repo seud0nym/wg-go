@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -44,12 +45,14 @@ func show(opts *cmdOptions) {
 
 func showDevice(dev wgtypes.Device, opts *cmdOptions) {
 	if opts.Option == "" {
+		showKeys := opts.ShowKeys
 		fmt.Printf("Interface: %s (%s)\n", dev.Name, dev.Type.String())
 		fmt.Printf("  public key: %s\n", dev.PublicKey.String())
-		fmt.Println("  private key: (hidden)")
+		fmt.Printf("  private key: %s\n", formatKey(dev.PrivateKey, showKeys))
 		fmt.Printf("  listening port: %d\n", dev.ListenPort)
+		fmt.Println()
 		for _, peer := range dev.Peers {
-			showPeers(peer)
+			showPeers(peer, showKeys)
 		}
 	} else {
 		deviceName := ""
@@ -76,11 +79,7 @@ func showDevice(dev wgtypes.Device, opts *cmdOptions) {
 			break
 		case "preshared-keys":
 			for _, peer := range dev.Peers {
-				psk := peer.PresharedKey.String()
-				if psk == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" {
-					psk = "(none)"
-				}
-				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), psk)
+				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), formatPSK(peer.PresharedKey, "(none)"))
 			}
 			break
 		case "endpoints":
@@ -90,11 +89,7 @@ func showDevice(dev wgtypes.Device, opts *cmdOptions) {
 			break
 		case "allowed-ips":
 			for _, peer := range dev.Peers {
-				allowdIpStrings := make([]string, 0, len(peer.AllowedIPs))
-				for _, v := range peer.AllowedIPs {
-					allowdIpStrings = append(allowdIpStrings, v.String())
-				}
-				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), strings.Join(allowdIpStrings, ", "))
+				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), joinIPs(peer.AllowedIPs))
 			}
 			break
 		case "latest-handshakes":
@@ -109,49 +104,40 @@ func showDevice(dev wgtypes.Device, opts *cmdOptions) {
 			break
 		case "persistent-keepalive":
 			for _, peer := range dev.Peers {
-				ka := strconv.FormatFloat(peer.PersistentKeepaliveInterval.Seconds(), 'g', 0, 64)
-				if ka == "0" {
-					ka = "off"
-				}
-				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), ka)
+				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), zeroToOff(strconv.FormatFloat(peer.PersistentKeepaliveInterval.Seconds(), 'g', 0, 64)))
 			}
 			break
 		case "dump":
-			fmark := strconv.FormatInt(int64(dev.FirewallMark), 10)
-			if fmark == "0" {
-				fmark = "off"
-			}
-			fmt.Printf("%s%s\t%s\t%d\t%s\n", deviceName, dev.PrivateKey.String(), dev.PublicKey.String(), dev.ListenPort, fmark)
+			fmt.Printf("%s%s\t%s\t%d\t%s\n", deviceName, dev.PrivateKey.String(), dev.PublicKey.String(), dev.ListenPort, zeroToOff(strconv.FormatInt(int64(dev.FirewallMark), 10)))
 			for _, peer := range dev.Peers {
-				psk := peer.PresharedKey.String()
-				if psk == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" {
-					psk = "(none)"
-				}
-				allowdIpStrings := make([]string, 0, len(peer.AllowedIPs))
-				for _, v := range peer.AllowedIPs {
-					allowdIpStrings = append(allowdIpStrings, v.String())
-				}
-				ka := strconv.FormatFloat(peer.PersistentKeepaliveInterval.Seconds(), 'f', 0, 64)
-				if ka == "0" {
-					ka = "off"
-				}
-				fmt.Printf("%s%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n", deviceName, peer.PublicKey.String(), psk, peer.Endpoint.String(), strings.Join(allowdIpStrings, ", "), peer.LastHandshakeTime.Unix(), peer.ReceiveBytes, peer.TransmitBytes, ka)
+				fmt.Printf("%s%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
+					deviceName,
+					peer.PublicKey.String(),
+					formatPSK(peer.PresharedKey, "(none)"),
+					peer.Endpoint.String(),
+					joinIPs(peer.AllowedIPs),
+					peer.LastHandshakeTime.Unix(),
+					peer.ReceiveBytes,
+					peer.TransmitBytes,
+					zeroToOff(strconv.FormatFloat(peer.PersistentKeepaliveInterval.Seconds(), 'g', 0, 64)))
 			}
 			break
 		}
 	}
 }
 
-func showPeers(peer wgtypes.Peer) {
-	const tmpl = `
-peer: {{ .PublicKey }}
+func showPeers(peer wgtypes.Peer, showKeys bool) {
+	const tmpl = `peer: {{ .PublicKey }}
   endpoint = {{ .Endpoint }}
   allowed ips = {{ .AllowedIPs }}
+  {{- if .PresharedKey}}
   preshared key = {{ .PresharedKey }}
+  {{- end}}
   keep alive interval = {{ .KeepAliveInterval }}s
   last handshake time = {{ .LastHandshakeTime }}
   transfer: {{ .ReceiveBytes }} bytes received, {{ .TransmitBytes }} bytes sent
   protocol version = {{ .ProtocolVersion }} 
+
 `
 	type tmplContent struct {
 		PublicKey         string
@@ -168,21 +154,47 @@ peer: {{ .PublicKey }}
 	t := template.Must(template.New("peer_tmpl").Parse(tmpl))
 	c := tmplContent{
 		PublicKey:         peer.PublicKey.String(),
-		PresharedKey:      "(hidden)",
+		PresharedKey:      formatPSK(peer.PresharedKey, ""),
 		Endpoint:          peer.Endpoint.String(),
 		KeepAliveInterval: peer.PersistentKeepaliveInterval.Seconds(),
 		LastHandshakeTime: peer.LastHandshakeTime.Format(time.RFC3339),
 		ReceiveBytes:      peer.ReceiveBytes,
 		TransmitBytes:     peer.TransmitBytes,
-		AllowedIPs:        "",
+		AllowedIPs:        joinIPs(peer.AllowedIPs),
 		ProtocolVersion:   peer.ProtocolVersion,
 	}
 
-	allowdIpStrings := make([]string, 0, len(peer.AllowedIPs))
-	for _, v := range peer.AllowedIPs {
-		allowdIpStrings = append(allowdIpStrings, v.String())
-	}
-	c.AllowedIPs = strings.Join(allowdIpStrings, ", ")
 	err := t.Execute(os.Stdout, c)
 	checkError(err)
+}
+
+func formatKey(key wgtypes.Key, showKeys bool) (string) {
+	k := "(hidden)"
+	if showKeys {
+		k = key.String()
+	}
+	return k
+}
+
+func formatPSK(key wgtypes.Key, none string) (string) {
+	psk := key.String()
+	if psk == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" {
+		return none
+	}
+	return psk
+}
+
+func joinIPs(ips []net.IPNet) (string) {
+	ipStrings := make([]string, 0, len(ips))
+	for _, v := range ips {
+		ipStrings = append(ipStrings, v.String())
+	}
+	return strings.Join(ipStrings, ", ")
+}
+
+func zeroToOff(value string) (string) {
+	if value == "0" {
+		return "off"
+	}
+	return value
 }

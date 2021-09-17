@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	ENV_WG_COMMAND = "WG_COMMAND"
+	ENV_WG_COMMAND   = "WG_COMMAND"
+	ENV_WG_HIDE_KEYS = "WG_HIDE_KEYS"
 )
 
 var (
@@ -15,7 +16,7 @@ var (
 )
 
 func main() {
-	opts := parseArgs()
+	opts := getOptions()
 
 	switch opts.SubCommand {
 	case "show":
@@ -50,13 +51,15 @@ type cmdOptions struct {
 	SubCommand string
 	Interface  string
 	Option     string
+	ShowKeys   bool
 }
 
-func parseArgs() *cmdOptions {
+func getOptions() *cmdOptions {
 	args := len(os.Args[1:])
 	base := 0
 	opts := cmdOptions{}
 
+	opts.ShowKeys = os.Getenv(ENV_WG_HIDE_KEYS) == "never"
 	opts.Command = os.Getenv(ENV_WG_COMMAND)
 	if opts.Command == "" {
 		opts.Command = "wg-go"

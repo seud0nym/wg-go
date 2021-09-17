@@ -4,7 +4,9 @@ BINARY="wg-go"
 
 build: *.go go.*
 	go build ${LDFLAGS} -o ${BINARY}
-	rm -rf /tmp/go-*
 
 clean:
 	rm -f ${BINARY}
+
+arm:
+	GOOS=linux GOARCH=arm GOARM=5 $(MAKE) build

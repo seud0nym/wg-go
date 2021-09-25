@@ -84,7 +84,7 @@ func showDevice(dev wgtypes.Device, opts *cmdOptions) {
 			break
 		case "endpoints":
 			for _, peer := range dev.Peers {
-				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), peer.Endpoint.String())
+				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), formatEndpoint(peer.Endpoint))
 			}
 			break
 		case "allowed-ips":
@@ -114,7 +114,7 @@ func showDevice(dev wgtypes.Device, opts *cmdOptions) {
 					deviceName,
 					peer.PublicKey.String(),
 					formatPSK(peer.PresharedKey, "(none)"),
-					peer.Endpoint.String(),
+					formatEndpoint(peer.Endpoint),
 					joinIPs(peer.AllowedIPs),
 					peer.LastHandshakeTime.Unix(),
 					peer.ReceiveBytes,
@@ -155,7 +155,7 @@ func showPeers(peer wgtypes.Peer, showKeys bool) {
 	c := tmplContent{
 		PublicKey:         peer.PublicKey.String(),
 		PresharedKey:      formatPSK(peer.PresharedKey, ""),
-		Endpoint:          peer.Endpoint.String(),
+		Endpoint:          formatEndpoint(peer.Endpoint),
 		KeepAliveInterval: peer.PersistentKeepaliveInterval.Seconds(),
 		LastHandshakeTime: peer.LastHandshakeTime.Format(time.RFC3339),
 		ReceiveBytes:      peer.ReceiveBytes,
@@ -168,7 +168,15 @@ func showPeers(peer wgtypes.Peer, showKeys bool) {
 	checkError(err)
 }
 
-func formatKey(key wgtypes.Key, showKeys bool) (string) {
+func formatEndpoint(endpoint *net.UDPAddr) string {
+	ip := endpoint.String()
+	if ip == "<nil>" {
+		ip = "(none)"
+	}
+	return ip
+}
+
+func formatKey(key wgtypes.Key, showKeys bool) string {
 	k := "(hidden)"
 	if showKeys {
 		k = key.String()
@@ -176,7 +184,7 @@ func formatKey(key wgtypes.Key, showKeys bool) (string) {
 	return k
 }
 
-func formatPSK(key wgtypes.Key, none string) (string) {
+func formatPSK(key wgtypes.Key, none string) string {
 	psk := key.String()
 	if psk == "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" {
 		return none
@@ -184,7 +192,7 @@ func formatPSK(key wgtypes.Key, none string) (string) {
 	return psk
 }
 
-func joinIPs(ips []net.IPNet) (string) {
+func joinIPs(ips []net.IPNet) string {
 	ipStrings := make([]string, 0, len(ips))
 	for _, v := range ips {
 		ipStrings = append(ipStrings, v.String())
@@ -192,7 +200,7 @@ func joinIPs(ips []net.IPNet) (string) {
 	return strings.Join(ipStrings, ", ")
 }
 
-func zeroToOff(value string) (string) {
+func zeroToOff(value string) string {
 	if value == "0" {
 		return "off"
 	}

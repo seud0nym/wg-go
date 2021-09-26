@@ -32,6 +32,17 @@ The `wg` script provides a convenient wrapper around `wg-go` to provide a level 
 
 This tool uses [wgctrl-go](https://github.com/WireGuard/wgctrl-go/) to enable control of WireGuard devices on multiple platforms.
 
+## Building
+
+This requires an installation of go ≥ 1.16.
+```
+git clone https://github.com/seud0nym/wg-go.git
+cd wg-go
+make
+```
+
+You can build the executable for different architectures and operating systems by setting the `GOOS`, `GOARCH`, and, if necessary, `GOARM` environment variables before running `make`, as specified in https://golang.org/doc/install/source#environment.
+
 ## Original Code
 
 This project was inspired by and based upon [QuantumGhost/wg-quick-go](https://github.com/QuantumGhost/wg-quick-go).

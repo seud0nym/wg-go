@@ -10,3 +10,7 @@ clean:
 
 arm:
 	GOOS=linux GOARCH=arm GOARM=5 $(MAKE) build
+
+update:
+	go get -u
+	go mod tidy

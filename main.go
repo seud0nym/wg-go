@@ -21,25 +21,18 @@ func main() {
 	switch opts.SubCommand {
 	case "show":
 		show(opts)
-		break
 	case "showconf":
 		showConfig(opts)
-		break
 	case "setconf":
 		setConfig(opts)
-		break
 	case "genkey":
 		genKey(opts)
-		break
 	case "genpsk":
 		genPSK(opts)
-		break
 	case "pubkey":
 		pubKey(opts)
-		break
 	case "--version":
 		showVersion(opts)
-		break
 	default:
 		fmt.Printf("Invalid subcommand: '%s'\n", opts.Command)
 		showCommandUsage(1, opts)

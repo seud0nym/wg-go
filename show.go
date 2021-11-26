@@ -27,14 +27,12 @@ func show(opts *cmdOptions) {
 		for i := 0; i < len(devices); i++ {
 			fmt.Println(devices[i].Name)
 		}
-		break
 	case "all":
 		devices, err := client.Devices()
 		checkError(err)
 		for _, dev := range devices {
 			showDevice(*dev, opts)
 		}
-		break
 	default:
 		dev, err := client.Device(opts.Interface)
 		checkError(err)
@@ -62,51 +60,40 @@ func showDevice(dev wgtypes.Device, opts *cmdOptions) {
 		switch opts.Option {
 		case "public-key":
 			fmt.Printf("%s%s\n", deviceName, dev.PublicKey.String())
-			break
 		case "private-key":
 			fmt.Printf("%s%s\n", deviceName, dev.PrivateKey.String())
-			break
 		case "listen-port":
 			fmt.Printf("%s%d\n", deviceName, dev.ListenPort)
-			break
 		case "fwmark":
 			fmt.Printf("%s%d\n", deviceName, dev.FirewallMark)
-			break
 		case "peers":
 			for _, peer := range dev.Peers {
 				fmt.Printf("%s%s\n", deviceName, peer.PublicKey.String())
 			}
-			break
 		case "preshared-keys":
 			for _, peer := range dev.Peers {
 				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), formatPSK(peer.PresharedKey, "(none)"))
 			}
-			break
 		case "endpoints":
 			for _, peer := range dev.Peers {
 				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), formatEndpoint(peer.Endpoint))
 			}
-			break
 		case "allowed-ips":
 			for _, peer := range dev.Peers {
 				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), joinIPs(peer.AllowedIPs))
 			}
-			break
 		case "latest-handshakes":
 			for _, peer := range dev.Peers {
 				fmt.Printf("%s%s\t%d\n", deviceName, peer.PublicKey.String(), peer.LastHandshakeTime.Unix())
 			}
-			break
 		case "transfer":
 			for _, peer := range dev.Peers {
 				fmt.Printf("%s%s\t%d\t%d\n", deviceName, peer.PublicKey.String(), peer.ReceiveBytes, peer.TransmitBytes)
 			}
-			break
 		case "persistent-keepalive":
 			for _, peer := range dev.Peers {
 				fmt.Printf("%s%s\t%s\n", deviceName, peer.PublicKey.String(), zeroToOff(strconv.FormatFloat(peer.PersistentKeepaliveInterval.Seconds(), 'g', 0, 64)))
 			}
-			break
 		case "dump":
 			fmt.Printf("%s%s\t%s\t%d\t%s\n", deviceName, dev.PrivateKey.String(), dev.PublicKey.String(), dev.ListenPort, zeroToOff(strconv.FormatInt(int64(dev.FirewallMark), 10)))
 			for _, peer := range dev.Peers {
@@ -121,7 +108,6 @@ func showDevice(dev wgtypes.Device, opts *cmdOptions) {
 					peer.TransmitBytes,
 					zeroToOff(strconv.FormatFloat(peer.PersistentKeepaliveInterval.Seconds(), 'g', 0, 64)))
 			}
-			break
 		}
 	}
 }

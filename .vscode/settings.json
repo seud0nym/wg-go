@@ -1,0 +1,17 @@
+{
+    "cSpell.words": [
+        "fwmark",
+        "genkey",
+        "genpsk",
+        "GOARCH",
+        "GOARM",
+        "preshared",
+        "pubkey",
+        "setconf",
+        "showconf",
+        "tmpl",
+        "userspace",
+        "wgctrl",
+        "wgtypes"
+    ]
+}

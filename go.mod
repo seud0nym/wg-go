@@ -1,15 +1,16 @@
-require golang.zx2c4.com/wireguard/wgctrl v0.0.0-20211124212657-dd7407c86d22
+require golang.zx2c4.com/wireguard/wgctrl v0.0.0-20220208144051-fde48d68ee68
 
 require (
-	github.com/google/go-cmp v0.5.6 // indirect
-	github.com/josharian/native v0.0.0-20200817173448-b6b71def0850 // indirect
-	github.com/mdlayher/genetlink v1.0.0 // indirect
-	github.com/mdlayher/netlink v1.4.1 // indirect
-	github.com/mdlayher/socket v0.0.0-20211102153432-57e3fa563ecb // indirect
-	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871 // indirect
-	golang.org/x/net v0.0.0-20211123203042-d83791d6bcd9 // indirect
-	golang.org/x/sys v0.0.0-20211124211545-fe61309f8881 // indirect
-	golang.zx2c4.com/wireguard v0.0.0-20211123210315-387f7c461a16 // indirect
+	github.com/google/go-cmp v0.5.7 // indirect
+	github.com/josharian/native v1.0.0 // indirect
+	github.com/mdlayher/genetlink v1.2.0 // indirect
+	github.com/mdlayher/netlink v1.6.0 // indirect
+	github.com/mdlayher/socket v0.1.2 // indirect
+	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2 // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
+	golang.zx2c4.com/wireguard v0.0.0-20220202223031-3b95c81cc178 // indirect
 )
 
 module github.com/seud0nym/wg-go

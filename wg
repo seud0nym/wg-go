@@ -49,7 +49,7 @@ if [ "do$1" == "do--uninstall" ]; then
     fi
 
     echo -e "${GREEN}Removing files...${GREY}"
-    for FILE in /lib/netifd/proto/wireguard.sh /usr/bin/wg-go /usr/bin/wireguard-go /usr/bin/wg; do
+    for FILE in /lib/netifd/proto/wireguard.sh /usr/bin/wg-go /usr/bin/wireguard-go /usr/bin/wg /etc/sysctl.d/99-wireguard.conf; do
         if [ -e "$FILE" ]; then
             echo -e "${GREEN} -> Removing $FILE${GREY}"
             rm "$FILE"

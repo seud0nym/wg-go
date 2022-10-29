@@ -13,4 +13,4 @@ require (
 
 module github.com/seud0nym/wg-go
 
-go 1.18
+go 1.19

@@ -12,7 +12,8 @@ const (
 )
 
 var (
-	appVersion = "dev"
+	appVersion    = "dev"
+	wgctrlVersion = "unknown"
 )
 
 func main() {
@@ -108,7 +109,7 @@ func showVersion(opts *cmdOptions) {
 	if opts.Interface == "--help" || opts.Interface != "" || opts.Option != "" {
 		showSubCommandUsage("version", opts)
 	}
-	fmt.Printf("wg-go v%s https://github.com/seud0nym/wg-go\n", appVersion)
+	fmt.Printf("wg-go v%s https://github.com/seud0nym/wg-go (wgctrl %s)\n", appVersion, wgctrlVersion)
 	os.Exit(0)
 }
 

@@ -1,5 +1,6 @@
-VERSION ?= `[ -d ".git" ] && git describe --tags --long --dirty || date +%Y.%m.%d-dev`
-LDFLAGS=-ldflags "-s -w -X main.appVersion=${VERSION}"
+APPVERSION ?= `[ -d ".git" ] && git describe --tags --long --dirty || date +%Y.%m.%d-dev`
+WGCTRLVERSION ?= `grep wgctrl go.mod | cut -d' ' -f3`
+LDFLAGS=-ldflags "-s -w -X main.appVersion=${APPVERSION} -X main.wgctrlVersion=${WGCTRLVERSION}"
 BINARY="wg-go"
 
 build: *.go go.*
